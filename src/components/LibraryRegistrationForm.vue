@@ -4,15 +4,39 @@
       <div class="col-md-8 offset-md-2">
         <h1 class="text-center mb-3">User Information Form / Credentials</h1>
 
-        <form @submit.prevent="submitForm">
+        <!-- Activity 2: HTML built-in validation -->
+        <!-- novalidate + was-validated class lets us control when Bootstrap's validation styles show -->
+        <form novalidate :class="{ 'was-validated': formSubmitted }" @submit.prevent="submitForm">
           <div class="mb-3">
             <label for="username" class="form-label">Username:</label>
-            <input type="text" class="form-control" id="username" v-model="formData.username" />
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              v-model="formData.username"
+              required
+              minlength="3"
+              maxlength="20"
+            />
+            <div class="invalid-feedback">
+              Username is required and must be between 3 and 20 characters.
+            </div>
           </div>
 
           <div class="mb-3">
             <label for="password" class="form-label">Password:</label>
-            <input type="password" class="form-control" id="password" v-model="formData.password" />
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              v-model="formData.password"
+              required
+              minlength="8"
+              pattern="^(?=.*[A-Za-z])(?=.*\d).+$"
+            />
+            <div class="invalid-feedback">
+              Password must be at least 8 characters and include both letters and numbers.
+            </div>
           </div>
 
           <div class="form-check mb-3">
@@ -32,16 +56,21 @@
               id="reason"
               rows="3"
               v-model="formData.reason"
+              required
+              minlength="10"
             ></textarea>
+            <div class="invalid-feedback">Please provide a reason (at least 10 characters).</div>
           </div>
 
           <div class="mb-3">
             <label for="gender" class="form-label">Gender</label>
-            <select class="form-select" id="gender" v-model="formData.gender">
+            <select class="form-select" id="gender" v-model="formData.gender" required>
+              <option value="" disabled>Select gender...</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
               <option value="other">Other</option>
             </select>
+            <div class="invalid-feedback">Please select a gender.</div>
           </div>
 
           <button type="submit" class="btn btn-primary me-2">Submit</button>
@@ -87,10 +116,27 @@ const formData = ref({
 
 const submittedCards = ref([])
 
-const submitForm = () => {
+// Activity 2: tracks whether we should show Bootstrap's valid/invalid styling
+const formSubmitted = ref(false)
+
+const submitForm = (event) => {
+  formSubmitted.value = true
+
+  // event.target is the <form> element; checkValidity() runs the HTML5
+  // built-in validation (required, minlength, pattern, etc.)
+  const form = event.target
+  if (!form.checkValidity()) {
+    // Invalid: stop here so Bootstrap's .was-validated styles highlight the errors
+    return
+  }
+
+  // Valid: proceed with submission
   submittedCards.value.push({
     ...formData.value,
   })
+
+  clearForm()
+  formSubmitted.value = false
 }
 
 const clearForm = () => {
