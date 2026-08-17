@@ -79,26 +79,19 @@
           <button type="button" class="btn btn-secondary" @click="clearForm">Clear</button>
         </form>
 
-        <div class="row mt-5" v-if="submittedCards.length">
-          <div class="d-flex flex-wrap justify-content-start">
-            <div
-              v-for="(card, index) in submittedCards"
-              :key="index"
-              class="card m-2"
-              style="width: 18rem"
-            >
-              <div class="card-header">User Information</div>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">Username: {{ card.username }}</li>
-                <li class="list-group-item">Password: {{ card.password }}</li>
-                <li class="list-group-item">
-                  Australian Resident: {{ card.isAustralian ? 'Yes' : 'No' }}
-                </li>
-                <li class="list-group-item">Gender: {{ card.gender }}</li>
-                <li class="list-group-item">Reason: {{ card.reason }}</li>
-              </ul>
-            </div>
-          </div>
+        <!-- Activity 4.3: submitted records now shown in a PrimeVue DataTable -->
+        <div class="mt-5" v-if="submittedCards.length">
+          <DataTable :value="submittedCards" tableStyle="min-width: 40rem">
+            <Column field="username" header="Username"></Column>
+            <Column field="password" header="Password"></Column>
+            <Column header="Australian Resident">
+              <template #body="slotProps">
+                {{ slotProps.data.isAustralian ? 'Yes' : 'No' }}
+              </template>
+            </Column>
+            <Column field="gender" header="Gender"></Column>
+            <Column field="reason" header="Reason"></Column>
+          </DataTable>
         </div>
       </div>
     </div>
@@ -107,6 +100,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const formData = ref({
   username: '',

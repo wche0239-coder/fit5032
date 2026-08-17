@@ -3,4 +3,16 @@ import { createApp } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+// Activity 4.2: PrimeVue setup
+import PrimeVue from 'primevue/config'
+import Aura from '@primeuix/themes/aura'
+
+const app = createApp(App)
+
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+  },
+})
+
+app.mount('#app')
