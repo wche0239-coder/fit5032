@@ -31,12 +31,10 @@
               id="password"
               v-model="formData.password"
               required
-              minlength="8"
-              pattern="^(?=.*[A-Za-z])(?=.*\d).+$"
+              minlength="4"
+              maxlength="12"
             />
-            <div class="invalid-feedback">
-              Password must be at least 8 characters and include both letters and numbers.
-            </div>
+            <div class="invalid-feedback">Password must be between 4 and 12 characters.</div>
           </div>
 
           <div class="form-check mb-3">
@@ -45,8 +43,10 @@
               class="form-check-input"
               id="isAustralian"
               v-model="formData.isAustralian"
+              required
             />
             <label class="form-check-label" for="isAustralian">Australian Resident?</label>
+            <div class="invalid-feedback">You must confirm this to proceed.</div>
           </div>
 
           <div class="mb-3">
