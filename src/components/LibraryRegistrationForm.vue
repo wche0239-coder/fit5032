@@ -4,9 +4,9 @@
       <div class="col-md-8 offset-md-2">
         <h1 class="text-center mb-3">User Information Form / Credentials</h1>
 
-        <!-- Activity 2: HTML built-in validation -->
-        <!-- novalidate + was-validated class lets us control when Bootstrap's validation styles show -->
-        <form novalidate :class="{ 'was-validated': formSubmitted }" @submit.prevent="submitForm">
+        <!-- Activity 3.1: HTML built-in validation attributes removed. -->
+        <!-- Validation is now handled entirely in Vue (see <script setup>). -->
+        <form @submit.prevent="submitForm">
           <div class="mb-3">
             <label for="username" class="form-label">Username:</label>
             <input
@@ -14,13 +14,10 @@
               class="form-control"
               id="username"
               v-model="formData.username"
-              required
-              minlength="3"
-              maxlength="20"
+              @blur="() => validateName(true)"
+              @input="() => validateName(false)"
             />
-            <div class="invalid-feedback">
-              Username is required and must be between 3 and 20 characters.
-            </div>
+            <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
           </div>
 
           <div class="mb-3">
@@ -30,11 +27,10 @@
               class="form-control"
               id="password"
               v-model="formData.password"
-              required
-              minlength="4"
-              maxlength="12"
+              @blur="() => validatePassword(true)"
+              @input="() => validatePassword(false)"
             />
-            <div class="invalid-feedback">Password must be between 4 and 12 characters.</div>
+            <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
           </div>
 
           <div class="form-check mb-3">
@@ -43,10 +39,10 @@
               class="form-check-input"
               id="isAustralian"
               v-model="formData.isAustralian"
-              required
+              @change="() => validateResident(true)"
             />
             <label class="form-check-label" for="isAustralian">Australian Resident?</label>
-            <div class="invalid-feedback">You must confirm this to proceed.</div>
+            <div v-if="errors.resident" class="text-danger">{{ errors.resident }}</div>
           </div>
 
           <div class="mb-3">
@@ -56,21 +52,27 @@
               id="reason"
               rows="3"
               v-model="formData.reason"
-              required
-              minlength="10"
+              @blur="() => validateReason(true)"
+              @input="() => validateReason(false)"
             ></textarea>
-            <div class="invalid-feedback">Please provide a reason (at least 10 characters).</div>
+            <div v-if="errors.reason" class="text-danger">{{ errors.reason }}</div>
           </div>
 
           <div class="mb-3">
             <label for="gender" class="form-label">Gender</label>
-            <select class="form-select" id="gender" v-model="formData.gender" required>
+            <select
+              class="form-select"
+              id="gender"
+              v-model="formData.gender"
+              @blur="() => validateGender(true)"
+              @change="() => validateGender(true)"
+            >
               <option value="" disabled>Select gender...</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
               <option value="other">Other</option>
             </select>
-            <div class="invalid-feedback">Please select a gender.</div>
+            <div v-if="errors.gender" class="text-danger">{{ errors.gender }}</div>
           </div>
 
           <button type="submit" class="btn btn-primary me-2">Submit</button>
@@ -116,27 +118,94 @@ const formData = ref({
 
 const submittedCards = ref([])
 
-// Activity 2: tracks whether we should show Bootstrap's valid/invalid styling
-const formSubmitted = ref(false)
+// Activity 3.2: object to store each field's error message (null = no error)
+const errors = ref({
+  username: null,
+  password: null,
+  resident: null,
+  gender: null,
+  reason: null,
+})
 
-const submitForm = (event) => {
-  formSubmitted.value = true
-
-  // event.target is the <form> element; checkValidity() runs the HTML5
-  // built-in validation (required, minlength, pattern, etc.)
-  const form = event.target
-  if (!form.checkValidity()) {
-    // Invalid: stop here so Bootstrap's .was-validated styles highlight the errors
-    return
+// Activity 3.3: Username validation
+const validateName = (blur) => {
+  if (formData.value.username.length < 3) {
+    if (blur) errors.value.username = 'Name must be at least 3 characters'
+  } else {
+    errors.value.username = null
   }
+}
 
-  // Valid: proceed with submission
-  submittedCards.value.push({
-    ...formData.value,
-  })
+// Activity 3.7: Password validation
+const validatePassword = (blur) => {
+  const password = formData.value.password
+  const minLength = 8
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasLowercase = /[a-z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
-  clearForm()
-  formSubmitted.value = false
+  if (password.length < minLength) {
+    if (blur) errors.value.password = `Password must be at least ${minLength} characters`
+  } else if (!hasUppercase) {
+    if (blur) errors.value.password = 'Password must contain at least one uppercase letter'
+  } else if (!hasLowercase) {
+    if (blur) errors.value.password = 'Password must contain at least one lowercase letter'
+  } else if (!hasNumber) {
+    if (blur) errors.value.password = 'Password must contain at least one number'
+  } else if (!hasSpecialChar) {
+    if (blur) errors.value.password = 'Password must contain at least one special character'
+  } else {
+    errors.value.password = null
+  }
+}
+
+// Activity 3.11: Australian Resident validation (self-practice)
+const validateResident = (blur) => {
+  if (!formData.value.isAustralian) {
+    if (blur) errors.value.resident = 'You must confirm your residency status'
+  } else {
+    errors.value.resident = null
+  }
+}
+
+// Activity 3.11: Gender validation (self-practice)
+const validateGender = (blur) => {
+  if (!formData.value.gender) {
+    if (blur) errors.value.gender = 'Please select a gender'
+  } else {
+    errors.value.gender = null
+  }
+}
+
+// Activity 3.11: Reason validation (self-practice)
+const validateReason = (blur) => {
+  if (formData.value.reason.trim().length < 10) {
+    if (blur) errors.value.reason = 'Reason must be at least 10 characters'
+  } else {
+    errors.value.reason = null
+  }
+}
+
+const submitForm = () => {
+  validateName(true)
+  validatePassword(true)
+  validateResident(true)
+  validateGender(true)
+  validateReason(true)
+
+  if (
+    !errors.value.username &&
+    !errors.value.password &&
+    !errors.value.resident &&
+    !errors.value.gender &&
+    !errors.value.reason
+  ) {
+    submittedCards.value.push({
+      ...formData.value,
+    })
+    clearForm()
+  }
 }
 
 const clearForm = () => {
@@ -146,6 +215,13 @@ const clearForm = () => {
     isAustralian: false,
     reason: '',
     gender: '',
+  }
+  errors.value = {
+    username: null,
+    password: null,
+    resident: null,
+    gender: null,
+    reason: null,
   }
 }
 </script>
