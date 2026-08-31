@@ -1,10 +1,14 @@
 <script setup>
-//import JSONLab from './components/JSON.vue'
-import Form from './components/LibraryRegistrationForm.vue'
+import BHeader from './components/BHeader.vue'
 </script>
 
 <template>
-  <!-- <JSON /> -->
-  <!-- <JSONLab /> -->
-  <Form />
+  <BHeader />
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <router-view></router-view>
+      </div>
+    </div>
+  </div>
 </template>
