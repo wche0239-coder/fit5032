@@ -15,6 +15,10 @@
         <li class="nav-item">
           <router-link to="/json-lab" class="nav-link" active-class="active">JSON Lab</router-link>
         </li>
+        <!--  Add Book -->
+        <li class="nav-item">
+          <router-link to="/addbook" class="nav-link" active-class="active">Add Book</router-link>
+        </li>
 
         <!-- Activity 6.1: conditional rendering based on auth state -->
         <li class="nav-item" v-if="isAuthenticated">
@@ -22,6 +26,11 @@
         </li>
         <li class="nav-item" v-else>
           <router-link to="/login" class="nav-link" active-class="active">Login</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/firelogin" class="nav-link" active-class="active"
+            >Firebase Login</router-link
+          >
         </li>
       </ul>
     </header>

@@ -5,6 +5,8 @@ import JsonLabView from '../components/JSON.vue'
 import LoginView from '../views/LoginView.vue'
 import AccessDeniedView from '../views/AccessDeniedView.vue'
 import { isAuthenticated } from '../auth'
+import FirebaseSigninView from '../views/FirebaseSigninView.vue'
+import AddBookView from '../views/AddBookView.vue'
 
 const routes = [
   {
@@ -16,7 +18,6 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutView,
-    // Activity 6.1: this route is restricted to authenticated users.
     meta: { requiresAuth: true },
   },
   {
@@ -34,17 +35,24 @@ const routes = [
     name: 'AccessDenied',
     component: AccessDeniedView,
   },
+  {
+    path: '/firelogin',
+    name: 'FireLogin',
+    component: FirebaseSigninView,
+  },
+  // 新增 AddBook 路由
+  {
+    path: '/addbook',
+    name: 'AddBook',
+    component: AddBookView,
+  },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-// Activity 6.1: Navigation guard.
-// Runs before every route change. If the destination route requires auth
-// and the user isn't logged in, redirect to /login, remembering where they
-// were trying to go so LoginView can send them back after a successful login.
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated.value) {
     next({ path: '/login', query: { redirect: to.fullPath } })
