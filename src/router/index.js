@@ -7,6 +7,7 @@ import AccessDeniedView from '../views/AccessDeniedView.vue'
 import { isAuthenticated } from '../auth'
 import FirebaseSigninView from '../views/FirebaseSigninView.vue'
 import AddBookView from '../views/AddBookView.vue'
+import LogoutView from '../views/LogoutView.vue'
 
 const routes = [
   {
@@ -40,11 +41,15 @@ const routes = [
     name: 'FireLogin',
     component: FirebaseSigninView,
   },
-  // 新增 AddBook 路由
   {
     path: '/addbook',
     name: 'AddBook',
     component: AddBookView,
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    component: LogoutView,
   },
 ]
 

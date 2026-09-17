@@ -32,6 +32,12 @@
             >Firebase Login</router-link
           >
         </li>
+        <!-- new: Firebase Logout page-->
+        <li class="nav-item">
+          <router-link to="/logout" class="nav-link" active-class="active"
+            >Firebase Logout</router-link
+          >
+        </li>
       </ul>
     </header>
   </div>

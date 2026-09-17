@@ -1,57 +1,72 @@
 <template>
-  <div class="login-view">
-    <h1 class="mb-3">Member Login</h1>
-    <p class="text-muted">Log in to access restricted areas of the library site.</p>
+  <div class="container mt-4" style="max-width: 500px">
+    <h2>Login</h2>
 
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="handleSignIn" class="mt-3">
       <div class="mb-3">
-        <label for="login-username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="login-username" v-model="username" />
+        <label class="form-label">Email</label>
+        <input
+          v-model="email"
+          type="email"
+          class="form-control"
+          placeholder="Enter email"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input
+          v-model="password"
+          type="password"
+          class="form-control"
+          placeholder="Enter password"
+          required
+        />
       </div>
 
-      <div class="mb-3">
-        <label for="login-password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="login-password" v-model="password" />
-      </div>
-
-      <div v-if="errorMessage" class="text-danger mb-3">{{ errorMessage }}</div>
-
-      <button type="submit" class="btn btn-primary">Log In</button>
+      <button type="submit" class="btn btn-primary w-100">Sign In</button>
     </form>
+
+    <p v-if="errorMsg" class="text-danger mt-3">{{ errorMsg }}</p>
+    <p v-if="successMsg" class="text-success mt-3">{{ successMsg }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { login } from '../auth'
+import { useRouter } from 'vue-router'
+import { auth } from '@/Firebase/init'
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
-const errorMessage = ref(null)
-
+const errorMsg = ref('')
+const successMsg = ref('')
 const router = useRouter()
-const route = useRoute()
 
-const handleSubmit = () => {
-  const success = login(username.value, password.value)
+const handleSignIn = () => {
+  errorMsg.value = ''
+  successMsg.value = ''
 
-  if (success) {
-    errorMessage.value = null
-    // Activity 6.1: send the user back to whichever page they were
-    // originally trying to reach (set by the navigation guard below),
-    // or Home if they came here directly.
-    const redirectTo = route.query.redirect || '/'
-    router.push(redirectTo)
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then((userCredential) => {
+      const user = userCredential.user
+      successMsg.value = `Signed in as ${user.email}`
+      console.log('✅ Signed in user:', user)
+      console.log('Current user from auth:', auth.currentUser)
+      router.push('/')
+    })
+    .catch((error) => {
+      errorMsg.value = `${error.code}: ${error.message}`
+      console.error('❌ Sign-in Error:', error)
+    })
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log('🔔 Current signed-in user:', user)
   } else {
-    errorMessage.value = 'Invalid username or password'
+    console.log('🔔 No user is signed in.')
   }
-}
+})
 </script>
-
-<style scoped>
-.login-view {
-  max-width: 400px;
-  margin: 0 auto;
-}
-</style>
