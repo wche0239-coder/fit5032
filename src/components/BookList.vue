@@ -17,36 +17,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import db from '@/Firebase/init'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, onSnapshot } from 'firebase/firestore'
 
 const books = ref([])
+let unsubscribe = null
 
-// Asynchronously query books that meet the criteria.
-const fetchBooks = async () => {
-  try {
-    // Construct a query for records in the `books` collection where `isbn > 1000`.
-    const q = query(collection(db, 'books'), where('isbn', '>', 1000))
+onMounted(() => {
+  const q = query(collection(db, 'books'), where('isbn', '>', 1000))
 
-    const querySnapshot = await getDocs(q)
-    const booksArray = []
-
-    querySnapshot.forEach((doc) => {
-      booksArray.push({
+  //
+  unsubscribe = onSnapshot(
+    q,
+    (querySnapshot) => {
+      books.value = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })
-    })
+      }))
+    },
+    (error) => {
+      console.error('Error listening to books: ', error)
+    },
+  )
+})
 
-    books.value = booksArray
-  } catch (error) {
-    console.error('Error fetching books: ', error)
-  }
-}
-
-// Automatically execute the query when the component mounts.
-onMounted(() => {
-  fetchBooks()
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
 })
 </script>

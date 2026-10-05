@@ -3,7 +3,7 @@ import { ref } from 'vue'
 const isAuthenticated = ref(false)
 const currentUser = ref(null)
 
-// 预设的多角色账号列表
+// List of pre-configured multi-role accounts
 export const PRESET_USERS = [
   {
     username: 'admin',
@@ -42,7 +42,7 @@ const login = (username, password) => {
   return false
 }
 
-// 快速切换角色登录
+// Quickly switch accounts to log in
 const quickLogin = (role) => {
   const found = PRESET_USERS.find((u) => u.role.toLowerCase() === role.toLowerCase())
   if (found) {
